@@ -1,0 +1,350 @@
+
+
+# ========================================================================================
+# 🐳 DOCKER COMPOSE - KAFKA + MONGODB PERSISTENCE LAB
+# ========================================================================================
+# 
+# ARQUITECTURA:
+# - Kafka ecosystem (Zookeeper + Kafka + UI) para streaming
+# - MongoDB para persistencia de documentos
+# - Mongo Express para visualización web
+#
+# ESTUDIANTES: Este compose combina:
+# 1. Infraestructura de mensajería (Kafka) de Lab 2
+# 2. Base de datos NoSQL (MongoDB) nueva
+# 3. Herramientas de monitoreo y visualización
+#
+# NETWORKING: Todos los servicios en la misma red Docker para comunicación interna
+# ========================================================================================
+
+services:
+  api-producer:
+    build:
+      context: .
+      dockerfile: src/api-producer/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8090:8080"        # HOST:CONTENEDOR  ← usamos 8090 para no chocar con Kafka UI
+    networks:
+      - kafka-mongo-network
+  adsbdb-consumer:
+    build:
+      context: .
+      dockerfile: src/api-producer/Dockerfile.worker
+    command: ["python", "consumers/adsbdb_consumer.py"]
+    environment:
+      - KAFKA_BROKER=kafka:29092   # coincide con KAFKA_ADVERTISED_LISTENERS interno
+      - KAFKA_TOPIC=events.raw
+      - KAFKA_GROUP_ID=adsbdb-mongo-writer
+      - MONGODB_URI=mongodb://admin:mongopass@mongodb:27017/
+      - MONGODB_DB=kafka_events_db
+      - EXPECTED_SOURCE=adsbdb
+    depends_on:
+      kafka:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      api-producer:
+        condition: service_started
+    networks:
+      - kafka-mongo-network
+
+  adsbdb-poller:
+    build:
+      context: .
+      dockerfile: src/api-producer/Dockerfile.worker
+    command: ["python", "pollers/adsbdb_poller.py"]
+    environment:
+      - PRODUCER_BASE_URL=http://api-producer:8080
+      - INTERVAL_SEC=3
+      - DURATION_SEC=120
+    depends_on:
+      api-producer:
+        condition: service_started
+    networks:
+      - kafka-mongo-network
+  # ==================================================================================
+  # 🐘 ZOOKEEPER - COORDINACIÓN DE KAFKA
+  # ==================================================================================
+  # PROPÓSITO: Gestiona la metadata y coordinación del cluster de Kafka
+  # DEPENDENCIAS: Ninguna (servicio fundamental)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    hostname: zookeeper
+    container_name: kafka-lab-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: WARN
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    networks:
+      - kafka-mongo-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================================================================================
+  # 📨 KAFKA BROKER - STREAMING PLATFORM
+  # ==================================================================================
+  # PROPÓSITO: Message broker para streaming de eventos en tiempo real
+  # DEPENDENCIAS: Zookeeper (para coordinación)
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: kafka
+    container_name: kafka-lab-broker
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      # Configuración básica de Kafka
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      
+      # Listeners: Cómo Kafka escucha conexiones
+      # PLAINTEXT: Para clientes internos (Docker network)
+      # PLAINTEXT_HOST: Para clientes externos (localhost)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      
+      # Configuración de replicación y offsets
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      
+      # JMX para monitoreo
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      
+      # Configuración de performance
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      
+      # Logs menos verbosos
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - kafka-mongo-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # ==================================================================================
+  # 🎛️ KAFKA UI - WEB INTERFACE PARA KAFKA
+  # ==================================================================================
+  # PROPÓSITO: Interfaz gráfica para visualizar topics, mensajes, consumer groups
+  # ACCESO: http://localhost:8080
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-lab-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      LOGGING_LEVEL_ROOT: WARN
+    networks:
+      - kafka-mongo-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================================================================================
+  # 🗄️ MONGODB - NOSQL DOCUMENT DATABASE
+  # ==================================================================================
+  # PROPÓSITO: Base de datos NoSQL para almacenar eventos de Kafka como documentos
+  # FEATURES CLAVE:
+  # - Schema-less: Flexibilidad para datos semi-estructurados
+  # - Horizontal scaling: Sharding para big data
+  # - Rich queries: Aggregation pipeline, geospatial, text search
+  # - Indexes: Performance optimization
+  mongodb:
+    image: mongo:7.0
+    hostname: mongodb
+    container_name: kafka-lab-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      # Credenciales de admin
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
+      
+      # Base de datos inicial para el lab
+      MONGO_INITDB_DATABASE: kafka_events_db
+    volumes:
+      # Persistencia de datos en volumen Docker
+      - mongodb-data:/data/db
+      - mongodb-config:/data/configdb
+      
+      # Script de inicialización (crear colecciones, índices, usuarios)
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - kafka-mongo-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: ["mongod", "--auth"]
+
+  # ==================================================================================
+  # 🌐 MONGO EXPRESS - WEB UI PARA MONGODB
+  # ==================================================================================
+  # PROPÓSITO: Interfaz web para explorar y gestionar MongoDB visualmente
+  # ACCESO: http://localhost:8081
+  # ESTUDIANTES: Úsenlo para:
+  # - Ver colecciones y documentos
+  # - Ejecutar queries manualmente
+  # - Verificar que los consumers están insertando datos
+  # - Explorar la estructura de documentos JSON
+  mongo-express:
+    image: mongo-express:1.0.0
+    container_name: kafka-lab-mongo-express
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      # Conexión a MongoDB
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopass
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      
+      # Credenciales de acceso a Mongo Express
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: mongopass
+      
+      # Configuración de UI
+      ME_CONFIG_SITE_BASEURL: /
+      ME_CONFIG_SITE_COOKIESECRET: mongoexpress
+      ME_CONFIG_SITE_SESSIONSECRET: mongoexpress
+    networks:
+      - kafka-mongo-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ====================================================================================
+# 📦 VOLUMES - PERSISTENCIA DE DATOS
+# ====================================================================================
+# CONCEPTO: Los volúmenes Docker persisten datos entre reinicios de contenedores
+# SIN VOLÚMENES: Si borras un contenedor, pierdes todos los datos
+# CON VOLÚMENES: Los datos sobreviven incluso si destruyes y recreas contenedores
+volumes:
+  zookeeper-data:
+    name: kafka-lab-zookeeper-data
+  zookeeper-logs:
+    name: kafka-lab-zookeeper-logs
+  kafka-data:
+    name: kafka-lab-kafka-data
+  mongodb-data:
+    name: kafka-lab-mongodb-data
+  mongodb-config:
+    name: kafka-lab-mongodb-config
+
+# ====================================================================================
+# 🌐 NETWORKS - RED DOCKER
+# ====================================================================================
+# CONCEPTO: Red privada para que los contenedores se comuniquen entre sí
+# BENEFICIOS:
+# - Aislamiento: No interfiere con otros proyectos Docker
+# - Service discovery: Los contenedores se encuentran por nombre (kafka, mongodb)
+# - Performance: Comunicación interna más rápida
+networks:
+  kafka-mongo-network:
+    name: kafka-mongo-network
+    driver: bridge
+
+# ====================================================================================
+# 📝 NOTAS PARA ESTUDIANTES
+# ====================================================================================
+#
+# 🚀 COMANDOS ÚTILES:
+#
+# Iniciar todos los servicios:
+#   docker-compose up -d
+#
+# Ver logs de un servicio específico:
+#   docker-compose logs -f kafka
+#   docker-compose logs -f mongodb
+#
+# Ver estado de servicios:
+#   docker-compose ps
+#
+# Detener todos los servicios:
+#   docker-compose down
+#
+# Detener Y eliminar volúmenes (¡cuidado! borra datos):
+#   docker-compose down -v
+#
+# Reiniciar un servicio específico:
+#   docker-compose restart kafka
+#
+# Acceder al shell de MongoDB:
+#   docker exec -it kafka-lab-mongodb mongosh -u admin -p mongopass
+#
+# Acceder al shell de Kafka:
+#   docker exec -it kafka-lab-broker bash
+#
+# ====================================================================================
+# 🔍 VERIFICACIÓN DE SERVICIOS:
+# ====================================================================================
+#
+# 1. Kafka UI: http://localhost:8080
+#    ✅ Deberías ver el cluster "local"
+#    ✅ Topics: smart-city-sensors, ecommerce-events, mobile-analytics
+#
+# 2. Mongo Express: http://localhost:8081 (admin/mongopass)
+#    ✅ Base de datos: kafka_events_db
+#    ✅ Colecciones: sensors, ecommerce, mobile_events
+#
+# 3. MongoDB (comando en terminal):
+#    docker exec -it kafka-lab-mongodb mongosh -u admin -p mongopass
+#    > use kafka_events_db
+#    > db.sensors.countDocuments()
+#    ✅ Debería mostrar el número de documentos insertados
+#
+# ====================================================================================
+# 🎯 ARQUITECTURA DE PUERTOS:
+# ====================================================================================
+#
+# Puerto  | Servicio      | Propósito
+# --------|---------------|----------------------------------------------------
+# 2181    | Zookeeper     | Coordinación de Kafka
+# 9092    | Kafka         | Conexión de producers/consumers
+# 8080    | Kafka UI      | Interfaz web de Kafka
+# 27017   | MongoDB       | Conexión de aplicaciones Python (pymongo)
+# 8081    | Mongo Express | Interfaz web de MongoDB
+#
+# ====================================================================================
+ 
+

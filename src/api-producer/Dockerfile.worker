@@ -1,0 +1,22 @@
+# Dockerfile.worker
+FROM python:3.11-slim
+
+# Paquetes base (opcional pero recomendable para TLS/HTTP)
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copiamos solo el código necesario
+# (ajusta rutas si tus archivos están en otra carpeta)
+COPY src/consumers/adsbdb_consumer.py consumers/adsbdb_consumer.py
+COPY src/pollers/adsbdb_poller.py    pollers/adsbdb_poller.py
+
+# Dependencias mínimas
+# - kafka-python: consumer Kafka
+# - pymongo: escribir en MongoDB
+# - requests: hacer POST al /ingest/adsbdb desde el poller
+RUN pip install --no-cache-dir kafka-python pymongo requests
+
+# Valor por defecto (lo sobreescribimos en docker-compose con `command`)
+CMD ["python", "consumers/adsbdb_consumer.py"]

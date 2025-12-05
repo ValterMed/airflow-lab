@@ -74,7 +74,7 @@ def get_mongodb_connection():
 # ========================================================================================
 # 📊 OBTENCIÓN DE DATOS
 # ========================================================================================
-@st.cache_data(ttl=30)  # Cache por 30 segundos
+@st.cache_data(ttl=10)  # Cache por 10 segundos
 def fetch_events(_collection, limit=10000):
     """
     Obtiene eventos de e-commerce desde MongoDB.
@@ -92,15 +92,39 @@ def fetch_events(_collection, limit=10000):
         events = list(cursor)
 
         if not events:
+            st.warning(f"No se encontraron eventos en la colección")
             return pd.DataFrame()
 
+        st.info(f"📥 Obtenidos {len(events)} eventos de MongoDB")
         df = pd.DataFrame(events)
 
         # Convertir timestamp a datetime
         if 'timestamp' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
-            df['hour'] = df['timestamp'].dt.hour
-            df['date'] = df['timestamp'].dt.date
+            # El producer genera timestamps en formato ISO 8601 sin timezone:
+            # Ejemplo: 2025-12-05T09:41:15.292860
+            try:
+                # Conversión simple - pandas maneja ISO 8601 automáticamente
+                df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+
+            except Exception as e:
+                st.warning(f"Error converting timestamps: {e}")
+                df['timestamp'] = pd.NaT
+
+            # Contar timestamps inválidos para debugging
+            invalid_count = df['timestamp'].isna().sum()
+            if invalid_count > 0:
+                st.warning(f"⚠️ {invalid_count} eventos con timestamps inválidos fueron descartados")
+
+            # Filtrar filas con timestamps válidos
+            df = df[df['timestamp'].notna()].copy()
+
+            # Solo continuar si hay datos válidos
+            if not df.empty and pd.api.types.is_datetime64_any_dtype(df['timestamp']):
+                # Extraer hora y fecha
+                df['hour'] = df['timestamp'].dt.hour
+                df['date'] = df['timestamp'].dt.date
+
+            st.success(f"✅ {len(df)} eventos con timestamps válidos después del filtrado")
 
         return df
 
@@ -432,31 +456,31 @@ def main():
 
     limit = st.sidebar.slider(
         "Límite de eventos a cargar",
-        min_value=100,
-        max_value=50000,
-        value=10000,
+        min_value=10,
+        max_value=100000,
+        value=50000,
         step=100
     )
 
-    auto_refresh = st.sidebar.checkbox("Auto-actualizar", value=False)
+    # auto_refresh = st.sidebar.checkbox("Auto-actualizar", value=False)
 
-    if auto_refresh:
-        refresh_interval = st.sidebar.slider(
-            "Intervalo de actualización (segundos)",
-            min_value=10,
-            max_value=300,
-            value=30,
-            step=10
-        )
-        # Forzar rerun después del intervalo
-        import time
-        time.sleep(refresh_interval)
-        st.rerun()
+    # if auto_refresh:
+    #     refresh_interval = st.sidebar.slider(
+    #         "Intervalo de actualización (segundos)",
+    #         min_value=10,
+    #         max_value=300,
+    #         value=30,
+    #         step=10
+    #     )
+    #     # Forzar rerun después del intervalo
+    #     import time
+    #     time.sleep(refresh_interval)
+    #     st.rerun()
 
     # Botón manual de refresh
-    if st.sidebar.button("🔄 Actualizar Datos"):
-        st.cache_data.clear()
-        st.rerun()
+    # if st.sidebar.button("🔄 Actualizar Datos"):
+    #     st.cache_data.clear()
+    #     st.rerun()
 
     # Información
     st.sidebar.markdown("---")

@@ -260,38 +260,40 @@ db.sensors.insertMany([
 print('✅ Insertados 3 documentos de ejemplo en sensors');
 
 // Ejemplo: E-commerce
-db.ecommerce.insertMany([
-    {
-        event_id: "EVT-" + Date.now() + "-1",
-        user_id: "USER-001",
-        event_type: "product_view",
-        product_name: "Laptop Dell XPS 15",
-        timestamp: new Date().toISOString(),
-        device_type: "Desktop",
-        city: "Ciudad de México"
-    },
-    {
-        event_id: "EVT-" + Date.now() + "-2",
-        user_id: "USER-001",
-        event_type: "add_to_cart",
-        product_name: "Laptop Dell XPS 15",
-        timestamp: new Date().toISOString(),
-        device_type: "Desktop",
-        city: "Ciudad de México"
-    },
-    {
-        event_id: "EVT-" + Date.now() + "-3",
-        user_id: "USER-001",
-        event_type: "purchase",
-        product_name: "Laptop Dell XPS 15",
-        amount: 25000,
-        timestamp: new Date().toISOString(),
-        device_type: "Desktop",
-        city: "Ciudad de México"
-    }
-]);
+// COMENTADO: No insertar datos de ejemplo, la colección debe iniciar vacía
+// Se comento porque producen otro tipo de timestamp que terminaba afectando el Dashboard con streamlit
+// db.ecommerce.insertMany([
+//     {
+//         event_id: "EVT-" + Date.now() + "-1",
+//         user_id: "USER-001",
+//         event_type: "product_view",
+//         product_name: "Laptop Dell XPS 15",
+//         timestamp: new Date().toISOString(),
+//         device_type: "Desktop",
+//         city: "Ciudad de México"
+//     },
+//     {
+//         event_id: "EVT-" + Date.now() + "-2",
+//         user_id: "USER-001",
+//         event_type: "add_to_cart",
+//         product_name: "Laptop Dell XPS 15",
+//         timestamp: new Date().toISOString(),
+//         device_type: "Desktop",
+//         city: "Ciudad de México"
+//     },
+//     {
+//         event_id: "EVT-" + Date.now() + "-3",
+//         user_id: "USER-001",
+//         event_type: "purchase",
+//         product_name: "Laptop Dell XPS 15",
+//         amount: 25000,
+//         timestamp: new Date().toISOString(),
+//         device_type: "Desktop",
+//         city: "Ciudad de México"
+//     }
+// ]);
 
-print('✅ Insertados 3 documentos de ejemplo en ecommerce');
+print('✅ Colección ecommerce lista (sin datos de ejemplo)');
 
 // Ejemplo: Mobile
 db.mobile_events.insertMany([

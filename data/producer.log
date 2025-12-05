@@ -26,3 +26,235 @@
 2025-12-05 08:45:19,820 - INFO -    📈 ecommerce.events: 180 events
 2025-12-05 08:45:19,820 - INFO -    📈 mobile-analytics: 0 events
 2025-12-05 08:45:19,820 - INFO - ✅ Producer shutdown complete
+2025-12-05 09:00:24,709 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 09:00:24,709 - INFO - Probing node bootstrap-0 broker version
+2025-12-05 09:00:24,710 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 09:00:24,822 - INFO - Broker version identified as 2.6.0
+2025-12-05 09:00:24,823 - INFO - Set configuration api_version=(2, 6, 0) to skip auto check_version requests on startup
+2025-12-05 09:00:24,830 - INFO - ✅ Connected to Kafka at localhost:9092
+2025-12-05 09:00:24,856 - INFO - 🎯 Kafka Producer Starting...
+2025-12-05 09:00:24,856 - INFO - 📍 Kafka Server: localhost:9092
+2025-12-05 09:00:24,856 - INFO - 📡 Stream: ecommerce
+2025-12-05 09:00:24,857 - INFO - ⏱️  Duration: 1 minutes
+2025-12-05 09:00:24,857 - INFO - 🚀 Event Rate: 3 events/second
+2025-12-05 09:00:24,857 - INFO - 📊 Topic: ecommerce
+2025-12-05 09:00:24,857 - INFO - 🚀 Starting ecommerce (ecommerce.events) for 1 minutes at 3 events/sec
+2025-12-05 09:00:24,868 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 09:00:24,868 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 09:00:24,869 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 09:00:57,917 - INFO - 📊 Produced 100 events in 33.1s (3.0 events/sec)
+2025-12-05 09:00:57,918 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:00:57,918 - INFO -    📈 ecommerce.events: 100 events
+2025-12-05 09:00:57,919 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:01:24,980 - INFO - 🧹 Cleaning up producer resources...
+2025-12-05 09:01:24,980 - INFO - Closing the Kafka producer with 9223372036.0 secs timeout.
+2025-12-05 09:01:24,981 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 09:01:24,981 - INFO - 📊 Produced 180 events in 60.1s (3.0 events/sec)
+2025-12-05 09:01:24,982 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:01:24,982 - INFO -    📈 ecommerce.events: 180 events
+2025-12-05 09:01:24,982 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:01:24,982 - INFO - ✅ Producer shutdown complete
+2025-12-05 09:15:32,475 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 09:15:32,475 - INFO - Probing node bootstrap-0 broker version
+2025-12-05 09:15:32,476 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 09:15:32,588 - INFO - Broker version identified as 2.6.0
+2025-12-05 09:15:32,589 - INFO - Set configuration api_version=(2, 6, 0) to skip auto check_version requests on startup
+2025-12-05 09:15:32,594 - INFO - ✅ Connected to Kafka at localhost:9092
+2025-12-05 09:15:32,614 - INFO - 🎯 Kafka Producer Starting...
+2025-12-05 09:15:32,615 - INFO - 📍 Kafka Server: localhost:9092
+2025-12-05 09:15:32,615 - INFO - 📡 Stream: ecommerce
+2025-12-05 09:15:32,615 - INFO - ⏱️  Duration: 5 minutes
+2025-12-05 09:15:32,615 - INFO - 🚀 Event Rate: 5 events/second
+2025-12-05 09:15:32,615 - INFO - 📊 Topic: ecommerce
+2025-12-05 09:15:32,615 - INFO - 🚀 Starting ecommerce (ecommerce.events) for 5 minutes at 5 events/sec
+2025-12-05 09:15:32,627 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 09:15:32,627 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 09:15:32,628 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 09:15:52,548 - INFO - 📊 Produced 100 events in 19.9s (5.0 events/sec)
+2025-12-05 09:15:52,548 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:15:52,548 - INFO -    📈 ecommerce.events: 100 events
+2025-12-05 09:15:52,548 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:16:12,682 - INFO - 📊 Produced 200 events in 40.1s (5.0 events/sec)
+2025-12-05 09:16:12,682 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:16:12,682 - INFO -    📈 ecommerce.events: 200 events
+2025-12-05 09:16:12,682 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:16:32,857 - INFO - 📊 Produced 300 events in 60.2s (5.0 events/sec)
+2025-12-05 09:16:32,857 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:16:32,858 - INFO -    📈 ecommerce.events: 300 events
+2025-12-05 09:16:32,858 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:16:53,092 - INFO - 📊 Produced 400 events in 80.5s (5.0 events/sec)
+2025-12-05 09:16:53,093 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:16:53,094 - INFO -    📈 ecommerce.events: 400 events
+2025-12-05 09:16:53,094 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:17:13,257 - INFO - 📊 Produced 500 events in 100.6s (5.0 events/sec)
+2025-12-05 09:17:13,257 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:17:13,258 - INFO -    📈 ecommerce.events: 500 events
+2025-12-05 09:17:13,258 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:17:33,391 - INFO - 📊 Produced 600 events in 120.8s (5.0 events/sec)
+2025-12-05 09:17:33,391 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:17:33,392 - INFO -    📈 ecommerce.events: 600 events
+2025-12-05 09:17:33,392 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:17:53,584 - INFO - 📊 Produced 700 events in 141.0s (5.0 events/sec)
+2025-12-05 09:17:53,584 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:17:53,584 - INFO -    📈 ecommerce.events: 700 events
+2025-12-05 09:17:53,585 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:18:13,626 - INFO - 📊 Produced 800 events in 161.0s (5.0 events/sec)
+2025-12-05 09:18:13,626 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:18:13,626 - INFO -    📈 ecommerce.events: 800 events
+2025-12-05 09:18:13,626 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:18:33,698 - INFO - 📊 Produced 900 events in 181.1s (5.0 events/sec)
+2025-12-05 09:18:33,699 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:18:33,700 - INFO -    📈 ecommerce.events: 900 events
+2025-12-05 09:18:33,700 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:18:53,782 - INFO - 📊 Produced 1000 events in 201.2s (5.0 events/sec)
+2025-12-05 09:18:53,783 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:18:53,783 - INFO -    📈 ecommerce.events: 1000 events
+2025-12-05 09:18:53,784 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:19:13,869 - INFO - 📊 Produced 1100 events in 221.3s (5.0 events/sec)
+2025-12-05 09:19:13,870 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:19:13,870 - INFO -    📈 ecommerce.events: 1100 events
+2025-12-05 09:19:13,870 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:19:33,949 - INFO - 📊 Produced 1200 events in 241.3s (5.0 events/sec)
+2025-12-05 09:19:33,949 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:19:33,950 - INFO -    📈 ecommerce.events: 1200 events
+2025-12-05 09:19:33,950 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:19:54,005 - INFO - 📊 Produced 1300 events in 261.4s (5.0 events/sec)
+2025-12-05 09:19:54,005 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:19:54,005 - INFO -    📈 ecommerce.events: 1300 events
+2025-12-05 09:19:54,006 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:20:14,047 - INFO - 📊 Produced 1400 events in 281.4s (5.0 events/sec)
+2025-12-05 09:20:14,048 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:20:14,048 - INFO -    📈 ecommerce.events: 1400 events
+2025-12-05 09:20:14,048 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:20:32,692 - INFO - 🧹 Cleaning up producer resources...
+2025-12-05 09:20:32,693 - INFO - Closing the Kafka producer with 9223372036.0 secs timeout.
+2025-12-05 09:20:32,694 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 09:20:32,696 - INFO - 📊 Produced 1492 events in 300.1s (5.0 events/sec)
+2025-12-05 09:20:32,696 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:20:32,696 - INFO -    📈 ecommerce.events: 1492 events
+2025-12-05 09:20:32,697 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:20:32,697 - INFO - ✅ Producer shutdown complete
+2025-12-05 09:41:15,176 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 09:41:15,177 - INFO - Probing node bootstrap-0 broker version
+2025-12-05 09:41:15,177 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 09:41:15,281 - INFO - Broker version identified as 2.6.0
+2025-12-05 09:41:15,281 - INFO - Set configuration api_version=(2, 6, 0) to skip auto check_version requests on startup
+2025-12-05 09:41:15,282 - INFO - ✅ Connected to Kafka at localhost:9092
+2025-12-05 09:41:15,291 - INFO - 🎯 Kafka Producer Starting...
+2025-12-05 09:41:15,292 - INFO - 📍 Kafka Server: localhost:9092
+2025-12-05 09:41:15,292 - INFO - 📡 Stream: ecommerce
+2025-12-05 09:41:15,292 - INFO - ⏱️  Duration: 5 minutes
+2025-12-05 09:41:15,292 - INFO - 🚀 Event Rate: 5 events/second
+2025-12-05 09:41:15,292 - INFO - 📊 Topic: ecommerce
+2025-12-05 09:41:15,292 - INFO - 🚀 Starting ecommerce (ecommerce.events) for 5 minutes at 5 events/sec
+2025-12-05 09:41:15,304 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 09:41:15,305 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 09:41:15,305 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 09:41:35,202 - INFO - 📊 Produced 100 events in 19.9s (5.0 events/sec)
+2025-12-05 09:41:35,203 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:41:35,203 - INFO -    📈 ecommerce.events: 100 events
+2025-12-05 09:41:35,203 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:41:55,340 - INFO - 📊 Produced 200 events in 40.0s (5.0 events/sec)
+2025-12-05 09:41:55,341 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:41:55,341 - INFO -    📈 ecommerce.events: 200 events
+2025-12-05 09:41:55,341 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:42:15,462 - INFO - 📊 Produced 300 events in 60.2s (5.0 events/sec)
+2025-12-05 09:42:15,463 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:42:15,466 - INFO -    📈 ecommerce.events: 300 events
+2025-12-05 09:42:15,466 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:42:35,681 - INFO - 📊 Produced 400 events in 80.4s (5.0 events/sec)
+2025-12-05 09:42:35,682 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:42:35,682 - INFO -    📈 ecommerce.events: 400 events
+2025-12-05 09:42:35,682 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:42:55,855 - INFO - 📊 Produced 500 events in 100.6s (5.0 events/sec)
+2025-12-05 09:42:55,859 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:42:55,859 - INFO -    📈 ecommerce.events: 500 events
+2025-12-05 09:42:55,863 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:43:16,016 - INFO - 📊 Produced 600 events in 120.7s (5.0 events/sec)
+2025-12-05 09:43:16,016 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:43:16,016 - INFO -    📈 ecommerce.events: 600 events
+2025-12-05 09:43:16,017 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:43:36,121 - INFO - 📊 Produced 700 events in 140.8s (5.0 events/sec)
+2025-12-05 09:43:36,121 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:43:36,121 - INFO -    📈 ecommerce.events: 700 events
+2025-12-05 09:43:36,121 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:43:56,212 - INFO - 📊 Produced 800 events in 160.9s (5.0 events/sec)
+2025-12-05 09:43:56,213 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:43:56,213 - INFO -    📈 ecommerce.events: 800 events
+2025-12-05 09:43:56,214 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:44:16,283 - INFO - 📊 Produced 900 events in 181.0s (5.0 events/sec)
+2025-12-05 09:44:16,283 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:44:16,284 - INFO -    📈 ecommerce.events: 900 events
+2025-12-05 09:44:16,284 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:44:36,354 - INFO - 📊 Produced 1000 events in 201.1s (5.0 events/sec)
+2025-12-05 09:44:36,354 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:44:36,354 - INFO -    📈 ecommerce.events: 1000 events
+2025-12-05 09:44:36,355 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:44:56,427 - INFO - 📊 Produced 1100 events in 221.1s (5.0 events/sec)
+2025-12-05 09:44:56,428 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:44:56,428 - INFO -    📈 ecommerce.events: 1100 events
+2025-12-05 09:44:56,429 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:45:16,507 - INFO - 📊 Produced 1200 events in 241.2s (5.0 events/sec)
+2025-12-05 09:45:16,508 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:45:16,509 - INFO -    📈 ecommerce.events: 1200 events
+2025-12-05 09:45:16,509 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:45:36,593 - INFO - 📊 Produced 1300 events in 261.3s (5.0 events/sec)
+2025-12-05 09:45:36,593 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:45:36,594 - INFO -    📈 ecommerce.events: 1300 events
+2025-12-05 09:45:36,594 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:45:56,668 - INFO - 📊 Produced 1400 events in 281.4s (5.0 events/sec)
+2025-12-05 09:45:56,669 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:45:56,670 - INFO -    📈 ecommerce.events: 1400 events
+2025-12-05 09:45:56,670 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:46:15,322 - INFO - 🧹 Cleaning up producer resources...
+2025-12-05 09:46:15,322 - INFO - Closing the Kafka producer with 9223372036.0 secs timeout.
+2025-12-05 09:46:15,324 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 09:46:15,325 - INFO - 📊 Produced 1492 events in 300.0s (5.0 events/sec)
+2025-12-05 09:46:15,326 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 09:46:15,326 - INFO -    📈 ecommerce.events: 1492 events
+2025-12-05 09:46:15,326 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 09:46:15,327 - INFO - ✅ Producer shutdown complete
+2025-12-05 10:12:07,124 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 10:12:07,125 - INFO - Probing node bootstrap-0 broker version
+2025-12-05 10:12:07,125 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 10:12:07,227 - INFO - Broker version identified as 2.6.0
+2025-12-05 10:12:07,227 - INFO - Set configuration api_version=(2, 6, 0) to skip auto check_version requests on startup
+2025-12-05 10:12:07,228 - INFO - ✅ Connected to Kafka at localhost:9092
+2025-12-05 10:12:07,232 - INFO - 🎯 Kafka Producer Starting...
+2025-12-05 10:12:07,233 - INFO - 📍 Kafka Server: localhost:9092
+2025-12-05 10:12:07,233 - INFO - 📡 Stream: ecommerce
+2025-12-05 10:12:07,233 - INFO - ⏱️  Duration: 1 minutes
+2025-12-05 10:12:07,233 - INFO - 🚀 Event Rate: 10 events/second
+2025-12-05 10:12:07,233 - INFO - 📊 Topic: ecommerce
+2025-12-05 10:12:07,233 - INFO - 🚀 Starting ecommerce (ecommerce.events) for 1 minutes at 10 events/sec
+2025-12-05 10:12:07,244 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 10:12:07,244 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 10:12:07,244 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 10:12:17,193 - INFO - 📊 Produced 100 events in 10.0s (10.0 events/sec)
+2025-12-05 10:12:17,193 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 10:12:17,193 - INFO -    📈 ecommerce.events: 100 events
+2025-12-05 10:12:17,194 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 10:12:27,264 - INFO - 📊 Produced 200 events in 20.0s (10.0 events/sec)
+2025-12-05 10:12:27,265 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 10:12:27,265 - INFO -    📈 ecommerce.events: 200 events
+2025-12-05 10:12:27,266 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 10:12:37,330 - INFO - 📊 Produced 300 events in 30.1s (10.0 events/sec)
+2025-12-05 10:12:37,330 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 10:12:37,330 - INFO -    📈 ecommerce.events: 300 events
+2025-12-05 10:12:37,330 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 10:12:47,389 - INFO - 📊 Produced 400 events in 40.2s (10.0 events/sec)
+2025-12-05 10:12:47,390 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 10:12:47,390 - INFO -    📈 ecommerce.events: 400 events
+2025-12-05 10:12:47,391 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 10:12:57,473 - INFO - 📊 Produced 500 events in 50.2s (10.0 events/sec)
+2025-12-05 10:12:57,474 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 10:12:57,474 - INFO -    📈 ecommerce.events: 500 events
+2025-12-05 10:12:57,474 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 10:13:07,250 - INFO - 🧹 Cleaning up producer resources...
+2025-12-05 10:13:07,251 - INFO - Closing the Kafka producer with 9223372036.0 secs timeout.
+2025-12-05 10:13:07,252 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 10:13:07,253 - INFO - 📊 Produced 596 events in 60.0s (9.9 events/sec)
+2025-12-05 10:13:07,254 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 10:13:07,254 - INFO -    📈 ecommerce.events: 596 events
+2025-12-05 10:13:07,254 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 10:13:07,255 - INFO - ✅ Producer shutdown complete

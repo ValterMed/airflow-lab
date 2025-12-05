@@ -14,8 +14,9 @@ LABEL description="E-commerce Analytics Dashboard with Streamlit"
 # Configurar working directory
 WORKDIR /app
 
-# Instalar dependencias del sistema si son necesarias
+# Instalar dependencias del sistema (curl para healthcheck)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements y instalar dependencias Python
@@ -24,6 +25,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código de la aplicación
 COPY app.py .
+
+# Copiar configuración de Streamlit
+COPY .streamlit /app/.streamlit
 
 # Exponer puerto de Streamlit
 EXPOSE 8501

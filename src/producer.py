@@ -402,7 +402,7 @@ class MultiStreamKafkaProducer:
             # Topic para datos de sensores urbanos
             "smart-city-sensors": self.sensor_generator.generate_sensor_event,
             # Topic para eventos de comercio electrónico
-            "ecommerce-events": self.ecommerce_generator.generate_ecommerce_event,
+            "ecommerce.events": self.ecommerce_generator.generate_ecommerce_event,
             # Topic para analytics de aplicaciones móviles
             "mobile-analytics": self.mobile_generator.generate_analytics_event
         }
@@ -569,7 +569,7 @@ class MultiStreamKafkaProducer:
         # Map stream names to topic names
         stream_to_topic = {
             'smart_city': 'smart-city-sensors',
-            'ecommerce': 'ecommerce-events',
+            'ecommerce': 'ecommerce.events',
             'mobile': 'mobile-analytics'
         }
         
@@ -766,7 +766,7 @@ Examples:
     logger.info(f"🚀 Event Rate: {rate} events/second")
     
     if stream == 'all':
-        logger.info("📊 Topics: smart-city-sensors, ecommerce-events, mobile-analytics")
+        logger.info("📊 Topics: smart-city-sensors, ecommerce.events, mobile-analytics")
         producer.run_simulation(duration_minutes=duration, events_per_second=rate)
     else:
         # Run only the selected stream

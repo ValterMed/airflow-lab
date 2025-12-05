@@ -1,0 +1,28 @@
+2025-12-05 08:44:19,578 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 08:44:19,578 - INFO - Probing node bootstrap-0 broker version
+2025-12-05 08:44:19,578 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 08:44:19,688 - INFO - Broker version identified as 2.6.0
+2025-12-05 08:44:19,688 - INFO - Set configuration api_version=(2, 6, 0) to skip auto check_version requests on startup
+2025-12-05 08:44:19,691 - INFO - ✅ Connected to Kafka at localhost:9092
+2025-12-05 08:44:19,695 - INFO - 🎯 Kafka Producer Starting...
+2025-12-05 08:44:19,695 - INFO - 📍 Kafka Server: localhost:9092
+2025-12-05 08:44:19,696 - INFO - 📡 Stream: ecommerce
+2025-12-05 08:44:19,696 - INFO - ⏱️  Duration: 1 minutes
+2025-12-05 08:44:19,696 - INFO - 🚀 Event Rate: 3 events/second
+2025-12-05 08:44:19,696 - INFO - 📊 Topic: ecommerce
+2025-12-05 08:44:19,696 - INFO - 🚀 Starting ecommerce (ecommerce.events) for 1 minutes at 3 events/sec
+2025-12-05 08:44:19,708 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: connecting to localhost:9092 [('127.0.0.1', 9092) IPv4]
+2025-12-05 08:44:19,709 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connecting> [IPv4 ('127.0.0.1', 9092)]>: Connection complete.
+2025-12-05 08:44:19,709 - INFO - <BrokerConnection node_id=bootstrap-0 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 08:44:52,761 - INFO - 📊 Produced 100 events in 33.1s (3.0 events/sec)
+2025-12-05 08:44:52,762 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 08:44:52,762 - INFO -    📈 ecommerce.events: 100 events
+2025-12-05 08:44:52,763 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 08:45:19,816 - INFO - 🧹 Cleaning up producer resources...
+2025-12-05 08:45:19,816 - INFO - Closing the Kafka producer with 9223372036.0 secs timeout.
+2025-12-05 08:45:19,818 - INFO - <BrokerConnection node_id=1 host=localhost:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2025-12-05 08:45:19,819 - INFO - 📊 Produced 180 events in 60.1s (3.0 events/sec)
+2025-12-05 08:45:19,819 - INFO -    📈 smart-city-sensors: 0 events
+2025-12-05 08:45:19,820 - INFO -    📈 ecommerce.events: 180 events
+2025-12-05 08:45:19,820 - INFO -    📈 mobile-analytics: 0 events
+2025-12-05 08:45:19,820 - INFO - ✅ Producer shutdown complete

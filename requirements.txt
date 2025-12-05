@@ -1,35 +1,22 @@
 # ========================================================================================
-# 📦 PYTHON DEPENDENCIES - KAFKA + MONGODB LAB
+# 📦 DEPENDENCIAS DEL PROYECTO - E-COMMERCE ANALYTICS PIPELINE
 # ========================================================================================
-# Install with: pip install -r requirements.txt
 #
-# RECOMENDACIÓN: Usa un entorno virtual
-# python -m venv venv
-# source venv/bin/activate  # En Windows: venv\Scripts\activate
-# pip install -r requirements.txt
+# INSTALACIÓN:
+#   pip install -r requirements.txt
+#
 # ========================================================================================
 
-# Kafka client for Python
-kafka-python==2.0.2
+# Kafka Client - IMPORTANTE: usar kafka-python-ng en lugar de kafka-python
+# kafka-python-ng es un fork mantenido que funciona con Python 3.12+
+kafka-python-ng==2.2.2
 
-# MongoDB driver for Python
-pymongo==4.6.1
+# MongoDB Driver
+pymongo==4.5.0
 
-# Data manipulation and analysis
-pandas==2.1.4
-numpy==1.26.2
+# Data Analysis & Visualization (para el dashboard, opcional para producers)
+pandas==2.1.1
+plotly==5.17.0
 
-# Data export formats
-pyarrow==14.0.1          # For Parquet file support
-
-# Optional: For advanced visualizations (Bonus exercises)
-plotly==5.18.0
-dash==2.14.2
-streamlit==1.29.0
-
-# Development and testing
-ipython==8.18.1          # Better Python REPL
-jupyter==1.0.0           # For notebook exploration
-
-# Logging and monitoring
-colorlog==6.8.0          # Colored logs (optional but nice)
+# Streamlit (solo para el dashboard, opcional para producers)
+streamlit==1.28.0

@@ -9,8 +9,7 @@ WORKDIR /app
 
 # Copiamos solo el código necesario
 # (ajusta rutas si tus archivos están en otra carpeta)
-COPY src/consumers/adsbdb_consumer.py consumers/adsbdb_consumer.py
-COPY src/pollers/adsbdb_poller.py    pollers/adsbdb_poller.py
+COPY src/consumers/ecommerce_consumer.py consumers/ecommerce_consumer.py
 
 # Dependencias mínimas
 # - kafka-python: consumer Kafka
@@ -19,4 +18,4 @@ COPY src/pollers/adsbdb_poller.py    pollers/adsbdb_poller.py
 RUN pip install --no-cache-dir kafka-python pymongo requests
 
 # Valor por defecto (lo sobreescribimos en docker-compose con `command`)
-CMD ["python", "consumers/adsbdb_consumer.py"]
+CMD ["python", "consumers/ecommerce_consumer.py"]

@@ -1,72 +1,69 @@
 
 
 # ========================================================================================
-# 🐳 DOCKER COMPOSE - KAFKA + MONGODB PERSISTENCE LAB
+# 🐳 DOCKER COMPOSE - ECOMMERCE ANALYTICS WITH KAFKA + MONGODB
 # ========================================================================================
-# 
-# ARQUITECTURA:
-# - Kafka ecosystem (Zookeeper + Kafka + UI) para streaming
-# - MongoDB para persistencia de documentos
-# - Mongo Express para visualización web
 #
-# ESTUDIANTES: Este compose combina:
-# 1. Infraestructura de mensajería (Kafka) de Lab 2
-# 2. Base de datos NoSQL (MongoDB) nueva
-# 3. Herramientas de monitoreo y visualización
+# ARQUITECTURA:
+# - Kafka ecosystem (Zookeeper + Kafka + UI) para streaming de eventos
+# - MongoDB para persistencia de eventos de e-commerce
+# - Consumer: Persiste eventos de Kafka a MongoDB
+# - Dashboard: Streamlit para visualización y análisis
+# - Mongo Express para administración de MongoDB
+#
+# FLUJO DE DATOS:
+# 1. Producer (manual) → Kafka topic: ecommerce.events
+# 2. Consumer → Lee de Kafka y escribe en MongoDB
+# 3. Dashboard → Lee de MongoDB y visualiza métricas
 #
 # NETWORKING: Todos los servicios en la misma red Docker para comunicación interna
 # ========================================================================================
 
 services:
-  api-producer:
-    build:
-      context: .
-      dockerfile: src/api-producer/Dockerfile
-    env_file:
-      - .env
-    depends_on:
-      kafka:
-        condition: service_healthy
-    ports:
-      - "8090:8080"        # HOST:CONTENEDOR  ← usamos 8090 para no chocar con Kafka UI
-    networks:
-      - kafka-mongo-network
-  adsbdb-consumer:
+  # ==================================================================================
+  # 🛒 ECOMMERCE CONSUMER - KAFKA → MONGODB
+  # ==================================================================================
+  # PROPÓSITO: Consume eventos de e-commerce desde Kafka y los persiste en MongoDB
+  ecommerce-consumer:
     build:
       context: .
       dockerfile: src/api-producer/Dockerfile.worker
-    command: ["python", "consumers/adsbdb_consumer.py"]
+    command: ["python", "consumers/ecommerce_consumer.py"]
     environment:
-      - KAFKA_BROKER=kafka:29092   # coincide con KAFKA_ADVERTISED_LISTENERS interno
-      - KAFKA_TOPIC=events.raw
-      - KAFKA_GROUP_ID=adsbdb-mongo-writer
+      - KAFKA_BROKER=kafka:29092
+      - KAFKA_TOPIC=ecommerce.events
+      - KAFKA_GROUP_ID=ecommerce-mongo-consumer
       - MONGODB_URI=mongodb://admin:mongopass@mongodb:27017/
       - MONGODB_DB=kafka_events_db
-      - EXPECTED_SOURCE=adsbdb
     depends_on:
       kafka:
         condition: service_healthy
       mongodb:
         condition: service_healthy
-      api-producer:
-        condition: service_started
     networks:
       - kafka-mongo-network
+    restart: unless-stopped
 
-  adsbdb-poller:
+  # ==================================================================================
+  # 📊 ECOMMERCE DASHBOARD - STREAMLIT VISUALIZATION
+  # ==================================================================================
+  # PROPÓSITO: Dashboard web interactivo para análisis de eventos de e-commerce
+  # ACCESO: http://localhost:8501
+  ecommerce-dashboard:
     build:
-      context: .
-      dockerfile: src/api-producer/Dockerfile.worker
-    command: ["python", "pollers/adsbdb_poller.py"]
+      context: ./src/dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
     environment:
-      - PRODUCER_BASE_URL=http://api-producer:8080
-      - INTERVAL_SEC=3
-      - DURATION_SEC=120
+      - MONGODB_URI=mongodb://admin:mongopass@mongodb:27017/
+      - MONGODB_DB=kafka_events_db
     depends_on:
-      api-producer:
-        condition: service_started
+      mongodb:
+        condition: service_healthy
     networks:
       - kafka-mongo-network
+    restart: unless-stopped
   # ==================================================================================
   # 🐘 ZOOKEEPER - COORDINACIÓN DE KAFKA
   # ==================================================================================
@@ -321,29 +318,34 @@ networks:
 #
 # 1. Kafka UI: http://localhost:8080
 #    ✅ Deberías ver el cluster "local"
-#    ✅ Topics: smart-city-sensors, ecommerce-events, mobile-analytics
+#    ✅ Topics: ecommerce.events
 #
-# 2. Mongo Express: http://localhost:8081 (admin/mongopass)
+# 2. E-commerce Dashboard: http://localhost:8501
+#    ✅ Visualización de métricas de e-commerce
+#    ✅ Análisis de segmentación de usuarios
+#
+# 3. Mongo Express: http://localhost:8081 (admin/mongopass)
 #    ✅ Base de datos: kafka_events_db
-#    ✅ Colecciones: sensors, ecommerce, mobile_events
+#    ✅ Colección: ecommerce
 #
-# 3. MongoDB (comando en terminal):
+# 4. MongoDB (comando en terminal):
 #    docker exec -it kafka-lab-mongodb mongosh -u admin -p mongopass
 #    > use kafka_events_db
-#    > db.sensors.countDocuments()
-#    ✅ Debería mostrar el número de documentos insertados
+#    > db.ecommerce.countDocuments()
+#    ✅ Debería mostrar el número de eventos insertados
 #
 # ====================================================================================
 # 🎯 ARQUITECTURA DE PUERTOS:
 # ====================================================================================
 #
-# Puerto  | Servicio      | Propósito
-# --------|---------------|----------------------------------------------------
-# 2181    | Zookeeper     | Coordinación de Kafka
-# 9092    | Kafka         | Conexión de producers/consumers
-# 8080    | Kafka UI      | Interfaz web de Kafka
-# 27017   | MongoDB       | Conexión de aplicaciones Python (pymongo)
-# 8081    | Mongo Express | Interfaz web de MongoDB
+# Puerto  | Servicio           | Propósito
+# --------|--------------------|-------------------------------------------------
+# 2181    | Zookeeper          | Coordinación de Kafka
+# 9092    | Kafka              | Conexión de producers/consumers
+# 8080    | Kafka UI           | Interfaz web de Kafka
+# 8501    | Dashboard          | Dashboard de análisis de e-commerce (Streamlit)
+# 27017   | MongoDB            | Conexión de aplicaciones Python (pymongo)
+# 8081    | Mongo Express      | Interfaz web de MongoDB
 #
 # ====================================================================================
  

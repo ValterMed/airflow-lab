@@ -55,10 +55,10 @@ clean-ports:
 	@echo "$(YELLOW)🧹 Liberando puertos del Lab 3...$(NC)"
 	@echo ""
 	@echo "$(BLUE)Deteniendo contenedores del Lab 2 (si existen)...$(NC)"
-	@-cd ../2-ETL-kafka && docker-compose down 2>/dev/null || true
+	@-cd ../2-ETL-kafka && docker compose down 2>/dev/null || true
 	@echo ""
 	@echo "$(BLUE)Deteniendo contenedores del Lab 3...$(NC)"
-	@docker-compose down
+	@docker compose down
 	@echo ""
 	@echo "$(BLUE)Verificando puertos...$(NC)"
 	@echo "Puerto 2181 (Zookeeper):"
@@ -79,7 +79,7 @@ clean-ports:
 # ==================================================================================
 start:
 	@echo "$(YELLOW)🚀 Iniciando servicios del Lab 3...$(NC)"
-	@docker-compose up -d
+	@docker compose up -d
 	@echo ""
 	@echo "$(BLUE)⏳ Esperando que los servicios inicialicen (30 segundos)...$(NC)"
 	@sleep 30
@@ -97,7 +97,7 @@ start:
 # ==================================================================================
 stop:
 	@echo "$(YELLOW)🛑 Deteniendo servicios...$(NC)"
-	@docker-compose stop
+	@docker compose stop
 	@echo "$(GREEN)✅ Servicios detenidos (datos preservados)$(NC)"
 
 # ==================================================================================
@@ -105,7 +105,7 @@ stop:
 # ==================================================================================
 restart:
 	@echo "$(YELLOW)🔄 Reiniciando servicios...$(NC)"
-	@docker-compose restart
+	@docker compose restart
 	@echo "$(BLUE)⏳ Esperando reinicio (20 segundos)...$(NC)"
 	@sleep 20
 	@make status
@@ -118,24 +118,24 @@ status:
 	@echo "$(BLUE)║  Estado de Servicios - Lab 3                             ║$(NC)"
 	@echo "$(BLUE)╚════════════════════════════════════════════════════════════╝$(NC)"
 	@echo ""
-	@docker-compose ps
+	@docker compose ps
 
 # ==================================================================================
 # 📝 LOGS - Ver logs de todos los servicios
 # ==================================================================================
 logs:
 	@echo "$(BLUE)📝 Logs de servicios (Ctrl+C para salir)...$(NC)"
-	@docker-compose logs -f
+	@docker compose logs -f
 
 # Logs de un servicio específico
 logs-kafka:
-	@docker-compose logs -f kafka
+	@docker compose logs -f kafka
 
 logs-mongodb:
-	@docker-compose logs -f mongodb
+	@docker compose logs -f mongodb
 
 logs-zookeeper:
-	@docker-compose logs -f zookeeper
+	@docker compose logs -f zookeeper
 
 # ==================================================================================
 # 📦 INSTALL - Instalar dependencias Python
@@ -172,7 +172,7 @@ clean-all:
 	@read confirm
 	@echo ""
 	@echo "$(YELLOW)🗑️  Deteniendo y limpiando...$(NC)"
-	@docker-compose down -v
+	@docker compose down -v
 	@echo "$(GREEN)✅ Todo limpio. Los datos han sido borrados.$(NC)"
 
 # ==================================================================================
@@ -184,7 +184,7 @@ verify:
 	@echo "$(BLUE)╚════════════════════════════════════════════════════════════╝$(NC)"
 	@echo ""
 	@echo "$(YELLOW)1. Verificando contenedores...$(NC)"
-	@docker-compose ps
+	@docker compose ps
 	@echo ""
 	@echo "$(YELLOW)2. Verificando puertos...$(NC)"
 	@echo -n "  Puerto 2181 (Zookeeper):  "

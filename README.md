@@ -1,331 +1,258 @@
-# Project Add-On: Real-Time API as Producer
-   3.1. [API Producer (FastAPI)](#31-api-producer-fastapi)  
-   3.2. [Poller (Scheduler)](#32-poller-scheduler)  
-   3.3. [Kafka and Topic](#33-kafka-and-topic)  
-   3.4. [Consumer (Kafka → MongoDB)](#34-consumer-kafka--mongodb)  
-   3.5. [MongoDB](#35-mongodb)
-4. [Data Schemas](#4-data-schemas)  
-   4.1. [Kafka Event](#41-kafka-event)  
-   4.2. [MongoDB Document](#42-mongodb-document)
-5. [Producer Endpoints](#5-producer-endpoints)  
-   5.1. [`POST /ingest`](#51-post-ingest)  
-   5.2. [`POST /ingest/adsbdb`](#52-post-ingestadsbdb)  
-   5.3. [`POST /ingest/adsbdb/poll`](#53-post-ingestadsbdbpoll)
-6. [Docker Compose Deployment](#6-docker-compose-deployment)  
-   6.1. [File Structure](#61-file-structure)  
-   6.2. [Dockerfiles](#62-dockerfiles)  
-   6.3. [Services in `docker-compose.yml`](#63-services-in-docker-composeyml)  
-   6.4. [Bring Up the Stack](#64-bring-up-the-stack)
-7. [Environment Configuration](#7-environment-configuration)
-8. [Quick Testing](#8-quick-testing)
-9. [Monitoring and Health](#9-monitoring-and-health)
-10. [Best Practices and Security](#10-best-practices-and-security)
-11. [Scalability Strategies](#11-scalability-strategies)
-12. [Troubleshooting (FAQ)](#12-troubleshooting-faq)
+# 🛒 E-commerce Analytics Pipeline - Guía de Uso
 
----
+## 📋 Descripción
 
-## 1) System Overview
-This project ingests real-time data from a **public aviation API (ADSBDB)** and processes it through **Kafka**:
-- The **API Producer (FastAPI)** fetches the API data and publishes events to a Kafka topic.
-- A **Consumer** listens to that topic and persists the payload into **MongoDB**, in a collection named after the `source` (e.g. `adsbdb`).
-- A **Poller** can automate periodic calls to the Producer every few seconds for a defined duration.
+Este proyecto implementa un pipeline completo de análisis de eventos de e-commerce utilizando:
+- **Kafka**: Para streaming de eventos en tiempo real
+- **MongoDB**: Para persistencia de eventos
+- **Streamlit**: Para visualización y análisis interactivo
 
----
+## 🏗️ Arquitectura
 
-## 2) Architecture and Data Flow
 ```
-[ADSBDB API] --> [FastAPI Producer] --> [Kafka Topic: events.raw] --> [Consumer] --> [MongoDB]
-                         ^                                              |
-                         | (Poller triggers periodic calls)             v
-                     [Optional Poller]                           Collection "adsbdb"
+Producer (Python) → Kafka (ecommerce.events) → Consumer (Python) → MongoDB
+                                                                        ↓
+                                                            Dashboard (Streamlit)
 ```
 
-**Flow:**  
-1. The Producer (FastAPI) calls `https://api.adsbdb.com/v0/aircraft/random`.  
-2. It extracts `response.aircraft` as the `payload` and publishes an event into Kafka (`events.raw`).  
-3. The Consumer subscribed to the topic filters for `source="adsbdb"`, and writes the `payload` as a new MongoDB document.
+## 🚀 Inicio Rápido
 
----
+### 1. Levantar la Infraestructura
 
-## 3) Components
-
-### 3.1 API Producer (FastAPI)
-- Endpoints:
-  - `POST /ingest`: Generic ingestion accepting `{ source, payload }`.
-  - `POST /ingest/adsbdb`: Fetches from ADSBDB and publishes the `aircraft` payload.
-  - `POST /ingest/adsbdb/poll`: Runs a background task calling ADSBDB repeatedly at intervals.
-
-### 3.2 Poller (Scheduler)
-- A small service that sends `POST /ingest/adsbdb` every *INTERVAL_SEC* seconds for *DURATION_SEC*.
-- Useful for automatic continuous ingestion in Docker environments.
-
-### 3.3 Kafka and Topic
-- Primary topic: **`events.raw`**.  
-- Producer publishes all events here.  
-- Consumer subscribes and filters by `source` value.
-
-### 3.4 Consumer (Kafka → MongoDB)
-- Reads events from Kafka.  
-- Filters `source == adsbdb`.  
-- Inserts/updates MongoDB collection named after `source`.  
-- Performs upserts to avoid duplicates using `event_id` or composite keys.
-
-### 3.5 MongoDB
-- Database: configurable (default: `kafka_events_db`).  
-- Collection: **`adsbdb`** (auto-created).  
-- Document: flat structure with all payload fields + metadata (`event_id`, timestamps, API version).
-
----
-
-## 4) Data Schemas
-
-### 4.1 Kafka Event
-```json
-{
-  "id": "3F28BC",
-  "timestamp": 1730000000000,
-  "source": "adsbdb",
-  "payload": {
-    "type": "G Hot Air Balloon",
-    "icao_type": "BALL",
-    "manufacturer": "Schroeder Fire Balloons",
-    "mode_s": "3F28BC",
-    "registration": "D-OBII",
-    "registered_owner_country_iso_name": "DE",
-    "registered_owner_country_name": "Germany",
-    "registered_owner_operator_flag_code": "BALL",
-    "registered_owner": "Private"
-  },
-  "ingested_at": 1730000000100,
-  "api_version": "1.0.0"
-}
-```
-
-### 4.2 MongoDB Document
-```json
-{
-  "_id": { "$oid": "..." },
-  "type": "G Hot Air Balloon",
-  "icao_type": "BALL",
-  "manufacturer": "Schroeder Fire Balloons",
-  "mode_s": "3F28BC",
-  "registration": "D-OBII",
-  "registered_owner_country_iso_name": "DE",
-  "registered_owner_country_name": "Germany",
-  "registered_owner_operator_flag_code": "BALL",
-  "registered_owner": "Private",
-  "event_id": "3F28BC",
-  "event_timestamp": 1730000000000,
-  "ingested_at": 1730000000100,
-  "api_version": "1.0.0",
-  "event_timestamp_iso": "2025-10-26T20:16:03.123Z",
-  "ingested_at_iso": "2025-10-26T20:16:03.123Z"
-}
-```
-
----
-
-## 5) Producer Endpoints
-
-### 5.1 `POST /ingest`
-Generic ingestion for any JSON source.  
-**Body:**
-```json
-{
-  "source": "manual",
-  "payload": { "message": "Hello from FastAPI", "value": 42 }
-}
-```
-**Example:**
 ```bash
-curl -X POST http://localhost:8090/ingest   -H "Content-Type: application/json"   -d '{"source":"manual","payload":{"message":"Hello","value":42}}'
+# Iniciar todos los servicios (Kafka, MongoDB, Consumer, Dashboard)
+docker compose up -d
+
+# Verificar que todos los servicios estén corriendo
+docker compose ps
 ```
 
-### 5.2 `POST /ingest/adsbdb`
-Fetches live data from ADSBDB and publishes an event.
+### 2. Generar Eventos de E-commerce
+
+Tienes dos opciones para generar eventos:
+
+#### Opción A: Producer Simple (un proceso)
+
 ```bash
-curl -X POST http://localhost:8090/ingest/adsbdb
+# Navegar a la carpeta src
+cd src
+
+# Instalar dependecias
+pip install -r requirements.txt
+
+# Ejecutar el producer para generar eventos de ecommerce
+# Duración: 5 minutos, Tasa: 5 eventos/segundo
+python producer.py --stream ecommerce --duration 5 --rate 5
 ```
 
-### 5.3 `POST /ingest/adsbdb/poll`
-Triggers a background task that repeats calls to the ADSBDB endpoint.
+#### Opción B: Multi-Producer (múltiples procesos simultáneos)
+
 ```bash
-curl -X POST "http://localhost:8090/ingest/adsbdb/poll?interval_sec=3&duration_sec=120"
+# Navegar a la carpeta src
+cd src
+
+# Ejecutar múltiples producers simultáneamente
+# 3 productores, cada uno durante 10 minutos a 5 eventos/sec
+python multi_producer.py --producers 3 --duration 10 --rate 5
 ```
 
----
+**Parámetros del Multi-Producer:**
+- `--producers N`: Número de instancias de producer a ejecutar en paralelo
+- `--duration M`: Duración en minutos de cada producer
+- `--rate R`: Eventos por segundo por cada producer
 
-## 6) Docker Compose Deployment
+### 3. Verificar que los Datos Fluyen
 
-### 6.1 File Structure
-```
-.
-├─ docker-compose.yml
-├─ Dockerfile
-├─ Dockerfile.worker
-├─ consumers/
-│  └─ adsbdb_consumer.py
-└─ pollers/
-   └─ adsbdb_poller.py
-```
+#### Kafka UI
+- URL: http://localhost:8080
+- Verifica que existe el tópico `ecommerce.events`
+- Deberías ver mensajes llegando en tiempo real
 
-### 6.2 Dockerfiles
+#### Mongo Express
+- URL: http://localhost:8081
+- Usuario: `admin`
+- Password: `mongopass`
+- Base de datos: `kafka_events_db`
+- Colección: `ecommerce`
 
-**Worker (shared for Consumer & Poller)**
-```dockerfile
-FROM python:3.11-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
-COPY consumers/adsbdb_consumer.py consumers/adsbdb_consumer.py
-COPY pollers/adsbdb_poller.py    pollers/adsbdb_poller.py
-RUN pip install --no-cache-dir kafka-python pymongo requests
-CMD ["python", "consumers/adsbdb_consumer.py"]
-```
+### 4. Visualizar el Dashboard
 
-### 6.3 Services in `docker-compose.yml`
-```yaml
-  adsbdb-consumer:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["python", "consumers/adsbdb_consumer.py"]
-    environment:
-      - KAFKA_BROKER=kafka:29092
-      - KAFKA_TOPIC=events.raw
-      - KAFKA_GROUP_ID=adsbdb-mongo-writer
-      - MONGODB_URI=mongodb://admin:mongopass@mongodb:27017/
-      - MONGODB_DB=kafka_events_db
-      - EXPECTED_SOURCE=adsbdb
-    depends_on:
-      kafka:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      api-producer:
-        condition: service_started
-    networks:
-      - kafka-mongo-network
+- URL: http://localhost:8501
+- El dashboard se actualiza automáticamente
+- Incluye:
+  - **Métricas Básicas**: Conteo de eventos por tipo, usuarios únicos, revenue
+  - **Segmentación de Usuarios**:
+    - Por frecuencia de eventos
+    - Por categorías de productos
+    - Por tipo de dispositivo/navegador
+    - Por horarios de actividad
 
-  adsbdb-poller:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["python", "pollers/adsbdb_poller.py"]
-    environment:
-      - PRODUCER_BASE_URL=http://api-producer:8080
-      - INTERVAL_SEC=3
-      - DURATION_SEC=120
-    depends_on:
-      api-producer:
-        condition: service_started
-    networks:
-      - kafka-mongo-network
-```
+## 📊 Tipos de Eventos Generados
 
-### 6.4 Bring Up the Stack
+El producer genera los siguientes tipos de eventos de e-commerce:
+
+1. **page_view**: Vista de página
+2. **product_view**: Vista de producto
+3. **add_to_cart**: Agregar al carrito
+4. **remove_from_cart**: Remover del carrito
+5. **purchase**: Compra completada
+6. **search**: Búsqueda de productos
+7. **login**: Inicio de sesión
+8. **logout**: Cierre de sesión
+
+## 🛠️ Comandos Útiles
+
+### Docker Compose
+
 ```bash
-docker compose up -d --build
-```
-Both services will start:  
-- **Poller** calls `/ingest/adsbdb` every 3s for 2 min.  
-- **Consumer** writes incoming events to MongoDB.
+# Ver logs de un servicio específico
+docker compose logs -f ecommerce-consumer
+docker compose logs -f ecommerce-dashboard
 
----
+# Reiniciar un servicio
+docker compose restart ecommerce-consumer
 
-## 7) Environment Configuration
+# Detener todos los servicios
+docker compose down
 
-**Producer**
-- `KAFKA_BROKER`
-- `KAFKA_TOPIC`
-- `API_VERSION`
-- `MAX_PAYLOAD_BYTES`
-- `REQUIRE_ID`
-- `ACCEPT_SOURCES`
-
-**Consumer**
-- `KAFKA_BROKER`, `KAFKA_TOPIC`, `KAFKA_GROUP_ID`
-- `MONGODB_URI`, `MONGODB_DB`
-- `EXPECTED_SOURCE`
-
-**Poller**
-- `PRODUCER_BASE_URL`
-- `INTERVAL_SEC`
-- `DURATION_SEC`
-
----
-
-## 8) Quick Testing
-
-**Check Producer health**
-```bash
-curl http://localhost:8090/health
+# Detener y eliminar volúmenes (¡cuidado! borra todos los datos)
+docker compose down -v
 ```
 
-**Send manual event**
-```bash
-curl -X POST http://localhost:8090/ingest   -H "Content-Type: application/json"   -d '{"source":"manual","payload":{"message":"Hello","value":1}}'
-```
+### MongoDB
 
-**Trigger ADSBDB ingest**
 ```bash
-curl -X POST http://localhost:8090/ingest/adsbdb
-```
+# Conectarse a MongoDB desde la terminal
+docker exec -it kafka-lab-mongodb mongosh -u admin -p mongopass
 
-**Trigger Poll job**
-```bash
-curl -X POST "http://localhost:8090/ingest/adsbdb/poll?interval_sec=3&duration_sec=120"
-```
-
-**View MongoDB data**
-```bash
-mongosh
+# Dentro de mongosh:
 use kafka_events_db
-db.adsbdb.find().limit(3).pretty()
+db.ecommerce.countDocuments()
+db.ecommerce.find().limit(5)
 ```
 
+### Kafka
+
+```bash
+# Ver tópicos disponibles
+docker exec -it kafka-lab-broker kafka-topics --list --bootstrap-server localhost:9092
+
+# Ver mensajes del tópico (desde el principio)
+docker exec -it kafka-lab-broker kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic ecommerce.events \
+  --from-beginning \
+  --max-messages 10
+```
+
+## 📈 Análisis Disponibles en el Dashboard
+
+### 1. Métricas Básicas
+- Total de eventos procesados
+- Usuarios únicos
+- Sesiones únicas
+- Revenue total (de compras)
+- Distribución de eventos por tipo
+
+### 2. Segmentación de Usuarios
+
+#### Por Frecuencia de Eventos
+- **Alto**: 20+ eventos
+- **Medio**: 10-19 eventos
+- **Bajo**: 1-9 eventos
+
+#### Por Categoría de Productos
+- Electronics
+- Appliances
+- Sports
+- Accessories
+- Education
+
+#### Por Dispositivo
+- iOS (iPhone/iPad)
+- Android
+- Windows
+- macOS
+
+#### Por Horario de Actividad
+- **Madrugada**: 0-6 horas
+- **Mañana**: 6-12 horas
+- **Tarde**: 12-18 horas
+- **Noche**: 18-24 horas
+
+## 🎯 Puertos y Servicios
+
+| Puerto | Servicio | Descripción |
+|--------|----------|-------------|
+| 2181 | Zookeeper | Coordinación de Kafka |
+| 9092 | Kafka | Broker de mensajes |
+| 8080 | Kafka UI | Interfaz web de Kafka |
+| 8501 | Dashboard | Dashboard de Streamlit |
+| 27017 | MongoDB | Base de datos |
+| 8081 | Mongo Express | Interfaz web de MongoDB |
+
+## 🐛 Troubleshooting
+
+### El consumer no está procesando eventos
+```bash
+# Verificar logs del consumer
+docker compose logs -f ecommerce-consumer
+
+# Reiniciar el consumer
+docker compose restart ecommerce-consumer
+```
+
+### El dashboard no muestra datos
+1. Verificar que el consumer esté corriendo y procesando eventos
+2. Verificar en Mongo Express que la colección `ecommerce` tiene documentos
+3. Refrescar el dashboard manualmente desde el sidebar
+
+### Kafka no está disponible
+```bash
+# Verificar health de Kafka
+docker compose ps
+
+# Ver logs de Kafka
+docker compose logs -f kafka
+
+# Reiniciar servicios de Kafka
+docker compose restart zookeeper kafka
+```
+
+## 📝 Notas Adicionales
+
+- Los datos se persisten en volúmenes de Docker, por lo que sobreviven a reinicios
+- Para empezar con datos frescos, usa `docker compose down -v`
+- El dashboard tiene auto-refresh configurable desde el sidebar
+- Los producers pueden ejecutarse fuera de Docker (en tu máquina local)
+- Asegúrate de tener Python 3.11+ y las dependencias instaladas si ejecutas los producers localmente
+
+## 🔗 Estructura del Proyecto
+
+```
+project_airflow/
+├── src/
+│   ├── producer.py              # Producer principal de eventos
+│   ├── multi_producer.py        # Launcher de múltiples producers
+│   ├── consumers/
+│   │   └── ecommerce_consumer.py   # Consumer de eventos de ecommerce
+│   └── dashboard/
+│       ├── app.py               # Aplicación Streamlit
+│       ├── Dockerfile           # Dockerfile del dashboard
+│       └── requirements.txt     # Dependencias del dashboard
+├── docker-compose.yml           # Orquestación de servicios
+└── ECOMMERCE_SETUP.md          # Esta guía
+```
+
+## ✅ Checklist de Verificación
+
+- [ ] Todos los servicios de docker-compose están corriendo
+- [ ] Kafka UI muestra el tópico `ecommerce.events`
+- [ ] El producer está generando eventos
+- [ ] El consumer está procesando eventos (ver logs)
+- [ ] Mongo Express muestra documentos en la colección `ecommerce`
+- [ ] El dashboard en http://localhost:8501 muestra datos
+
 ---
-
-## 9) Monitoring and Health
-- Producer: `/health` endpoint with counters and last error.  
-- Logs show producer, consumer, and poller activity.  
-- Kafka monitoring can use `kafka-consumer-groups.sh` to check offsets/lag.
-
----
-
-## 10) Best Practices and Security
-- Use **timeouts/retries** when calling external APIs.  
-- Configure **payload size limits**.  
-- Validate inputs via **Pydantic** models.  
-- Manage **secrets via environment variables**.  
-- Restrict external exposure—only expose FastAPI port 8090.
-
----
-
-## 11) Scalability Strategies
-- **Horizontal scaling**: multiple consumers with same `group.id`.  
-- **Kafka partitioning** for higher throughput.  
-- **Batch inserts** into Mongo for performance.  
-- Maintain indexes (`event_id`, `(mode_s, registration, event_timestamp)`).
-
----
-
-## 12) Troubleshooting (FAQ)
-
-**Q: `/ingest/adsbdb` returns 502**  
-A: The public API may be down or slow. Retry; check producer logs.
-
-**Q: Consumer doesn’t insert into Mongo.**  
-A: Verify connection string, Kafka internal broker (`kafka:29092`), and credentials.
-
-**Q: No documents in MongoDB.**  
-A: Ensure event `source="adsbdb"` and the consumer is running.
-
-**Q: Duplicate entries in MongoDB.**  
-A: Adjust upsert keys (e.g., `event_id` or `mode_s`).
-
----
-
-> Complete, modular, and scalable pipeline: **Public API → Kafka → FastAPI Producer → MongoDB**.
 
 ### Author: Valeria Ramirez Hernandez
